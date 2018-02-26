@@ -78,6 +78,7 @@ def data_loader(img_dir, ann_path, batch_size=16, shuffle=True, mode='train'):
                                     Transforms.Normalize(mean=(0.5, 0.5, 0.5), 
                                                          std=(0.5, 0.5, 0.5))
                                    ])
+    
     dset = CelebA(img_dir, ann_path, transform, mode=mode)
     dloader = torch.utils.data.DataLoader(dset, 
                                           batch_size=batch_size, 

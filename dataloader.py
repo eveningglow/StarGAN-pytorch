@@ -13,27 +13,21 @@ class CelebA(Dataset):
         attr_name = ann_file[1].split()
         attr_val = ann_file[2:]
         
-        # ========================================================= #
-        # 실제 깃허브에 올릴 test_set 선별 코드
-        #test_num = [5, 84, 277, 800, 1019, 1307, 2000]
-        test_num = [33, 84, 277, 2043, 800, 1019, 1307]
-        # 실제 training 및 확인을 위한 test_set 션별 코드. 업로드 전 data/test 와 함께 삭제
-        #male = os.listdir('data/test/0')
-        #female = os.listdir('data/test/1')
+        male = os.listdir('data/test/0')
+        female = os.listdir('data/test/1')
 
-        #for i in range(len(male)):
-        #    num, _ = os.path.splitext(male[i])
-        #    num = int(num)
-        #    male[i] = num-1
+        for i in range(len(male)):
+            num, _ = os.path.splitext(male[i])
+            num = int(num)
+            male[i] = num-1
         
-        #for i in range(len(female)):
-        #    num, _ = os.path.splitext(female[i])
-        #    num = int(num)
-        #    female[i] = num-1
+        for i in range(len(female)):
+            num, _ = os.path.splitext(female[i])
+            num = int(num)
+            female[i] = num-1
 
-        #test_num = male + female
-        # ========================================================= #
-            
+        test_num = male + female
+
         if mode == 'train':
             attr_val = [x for i, x in enumerate(attr_val) if i not in test_num]
         elif mode == 'test':

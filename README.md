@@ -3,7 +3,7 @@ __Pytorch__ implementation of [StarGAN : Unified Generative Adversarial Networks
 This model can translate an input image into multiple domains by concatenating extra label vectors. Mask vector is not implemented.
 
 ## Result
-You can see the more results in `png`. The results have a same order with images below(input, black, blonde, brown ...)
+You can see the more results for all the test images in `png`. The results have a same order with images below(input, black, blonde, brown ...)
 <p align="center"><img width="100%" src="png/represent.png" /></p>
 
 ## Model

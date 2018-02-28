@@ -11,7 +11,7 @@ import model
 import util
 
 class Solver():
-    def __init__(self, img_dir='data/img', ann_path='data/list_attr_celeba.txt', 
+    def __init__(self, img_dir='data/img', ann_path'data/list_attr_celeba.txt', 
                  result_dir='result', weight_dir='weight', 
                  batch_size=16, lr=0.001, beta1=0.5, beta2=0.999, lambda_gp=10, lambda_recon=10,
                  n_critic=5, class_num=5, num_epoch=20, save_every=500, load_weight=False):
@@ -26,8 +26,8 @@ class Solver():
         self.dloader, self.dlen = data_loader(img_dir, ann_path, batch_size=batch_size, 
                                               shuffle=True, mode='train')
         
-        self.D = model.Discriminator(class_num=class_num).type(self.dtype)
-        self.G = model.Generator().type(self.dtype)
+        self.D = model.Discriminator(class_num=class_num).type(dtype)
+        self.G = model.Generator().type(dtype)
         
         self.optim_D = optim.Adam(self.D.parameters(), lr=lr, betas=(beta1, beta2))
         self.optim_G = optim.Adam(self.G.parameters(), lr=lr, betas=(beta1, beta2))
@@ -35,20 +35,16 @@ class Solver():
         self.BCE_loss = nn.BCEWithLogitsLoss(size_average=False)
         self.L1_loss = nn.L1Loss(size_average=True)
         
-        self.start_epoch = 0
         self.num_epoch = num_epoch
         self.n_critic = n_critic
+        self.class_num = class_num
         self.lr = lr
         self.lambda_gp = lambda_gp
         self.lambda_recon = lambda_recon
-        
         self.save_every = save_every
         self.load_weight = load_weight
-        self.class_num = class_num
-        self.result_dir = result_dir
-        self.weight_dir = weight_dir
         
-    def lr_scheduler(self, optim, epoch, init_lr):
+    def lr_scheduler(optim, epoch, init_lr):
         if epoch >= 10:
             lr = init_lr - init_lr / 10 * (epoch - 10)
         else:
@@ -61,26 +57,17 @@ class Solver():
             param_group['lr'] = lr
 
         return optim
-    
-    def load_pretrained(self):
-        self.D.load_state_dict(torch.load(os.path.join(self.weight_dir, 'D.pkl')))
-        self.G.load_state_dict(torch.load(os.path.join(self.weight_dir, 'G.pkl')))
         
-        log_file = open('log.txt', 'r')
-        line = log_file.readline()
-        self.start_epoch = int(line)
-        
-    def train(self):
-        if self.load_weight is True:
-            self.load_pretrained()
-            
-        for epoch in range(self.start_epoch, self.num_epoch):
-            self.optim_D = self.lr_scheduler(self.optim_D, epoch, self.lr)
-            self.optim_G = self.lr_scheduler(self.optim_G, epoch, self.lr)
+    def train():
+        for epoch in range(num_epoch):
+            self.optim_D = lr_scheduler(self.optim_D, epoch, self.lr)
+            self.optim_G = lr_scheduler(self.optim_G, epoch, self.lr)
 
             for iters, (real_img, real_label) in enumerate(self.dloader):
                 N, C, H, W = real_img.size()   
 
+                ''' ------------------------------ 1. Train D ------------------------------ '''
+                
                 real_img = util.var(real_img, requires_grad=False)    
                 real_label = util.var(real_label, requires_grad=False)
 
@@ -88,7 +75,7 @@ class Solver():
                 real_src_score, real_cls_score = self.D(real_img)
 
                 real_src_loss = -torch.mean(real_src_score)
-                real_cls_loss = self.BCE_loss(real_cls_score, real_label) / N
+                real_cls_loss = BCE_loss(real_cls_score, real_label) / N
 
                 # Make random target label and c using real label and concat with real img
                 target_label = real_label[torch.randperm(real_label.size(0)).type(self.itype)]
@@ -122,6 +109,8 @@ class Solver():
                 D_loss.backward()
                 self.optim_D.step()
 
+                ''' ------------------------------ 1. Train G ------------------------------ '''
+                
                 if iters % self.n_critic == 0:
                     # Source and classification loss with fake img and target label
                     fake_img = self.G(real_img, target_label)
@@ -140,11 +129,6 @@ class Solver():
                     G_loss.backward()
                     self.optim_G.step()
 
-                # Write log
-                log_file = open('log.txt', 'w')
-                log_file.write(str(epoch))
-                
-                # Print loss, save result images and weights
                 if iters % self.save_every == 0:
                     if os.path.exists(self.result_dir) is False:
                         os.makedirs(self.result_dir)

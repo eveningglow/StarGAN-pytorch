@@ -1,6 +1,6 @@
 # StarGAN-pytorch
 __Pytorch__ implementation of [StarGAN : Unified Generative Adversarial Networks for Multi-Domain Image-to-Image Translation](https://arxiv.org/abs/1711.09020).
-This model can translate an input image into multiple domains by concatenating extra label vectors. Mask vector is not implemented.
+This model can translate an input image into multiple domains by concatenating extra label vectors. Mask vector is not implemented.  
 
 ## Result
 You can see the more results for all the test images in `png`. The results have a same order with images below(input, black, blonde, brown ...)
@@ -17,6 +17,10 @@ Follwing is the location of each file.
 * __Training images__ : `data/img`    
 * __Test images - Male__ : `data/test/0`  
 * __Test images - Female__ : `data/test/1`  
+
+## Prerequisites
+* [Python 3.5+](https://www.continuum.io/downloads)
+* [PyTorch 0.2.0](http://pytorch.org/)  
 
 ## How to train  
 * Training from scratch  
